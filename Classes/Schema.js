@@ -25,10 +25,10 @@ class Schema extends Base{
         return this._treat(this.name, "delete", options)
     }
 
-    create(){
+    create(name){
         let colus = {}
         this.columns.forEach(col => colus[col.name] = col.value)
-        return this._treat(this.name, "create", colus)
+        return this._treat((name || this.name), "create", colus)
     }
 
     truncate(){
