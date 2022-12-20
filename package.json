@@ -1,0 +1,23 @@
+{
+  "name": "@kamkam1_0/sql-orm",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/KamKam0/sql-orm.git"
+  },
+  "bugs": {
+    "url": "https://github.com/KamKam0/sql-orm/issues"
+  },
+  "keywords": ["Discordjs", "Events", "Handler"],
+  "homepage": "https://github.com/KamKam0/sql-orm",
+  "author": "KamKam <kamkam.dev.contact@gmail.com>",
+  "license": "BSD 2",
+  "dependencies": {
+    "mysql2": "^2.3.3"
+  }
+}
