@@ -9,7 +9,7 @@ class Basic{
 
     _treat(table, argu, options1, options2){
         return new Promise((resolve, reject) => {
-            if(!this.connectionState()) return reject("No SQL connection")
+            if(!this.connectionState) return reject("No SQL connection")
             let query = Basic.getQuery(table, argu, options1, options2)
             if(query.code !== 0) return reject(query.error)
             this.query(query.query)

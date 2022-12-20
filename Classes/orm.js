@@ -8,7 +8,7 @@ class ORM extends Base{
     }
     
     createScheme(elements){
-        if(!this.connectionState()) return "No SQL connection"
+        if(!this.connectionState) return "No SQL connection"
         if(this.schemas.get(elements.id)) return "Already Exists"
         let datas = Schemas.checkDatas(elements)
         if(datas.code !== 0) return datas.error
@@ -18,13 +18,13 @@ class ORM extends Base{
     }
 
     deleteScheme(id){
-        if(!this.connectionState()) return "No SQL connection"
+        if(!this.connectionState) return "No SQL connection"
         if(!this.schemas.get(id)) return "Doesn't Exist"
         this.schemas.delete(id)
     }
 
     getScheme(id){
-        if(!this.connectionState()) return "No SQL connection"
+        if(!this.connectionState) return "No SQL connection"
         if(!this.schemas.get(id)) return "Doesn't Exist"
         return this.schemas.get(id)
     }

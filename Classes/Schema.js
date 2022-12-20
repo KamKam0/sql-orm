@@ -60,7 +60,7 @@ class Schema extends Base{
     }
 
     #deploy(){
-        if(!this.connectionState()) return "No SQL connection"
+        if(!this.connectionState) return "No SQL connection"
         this.show()
         .then(datas => {
             datas = datas.map(e => Object.values(e)[0])
