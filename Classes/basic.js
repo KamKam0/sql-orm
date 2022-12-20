@@ -3,7 +3,7 @@ class Basic{
         this._connection = connection
     }
 
-    checkConnection(){
+    get connectionState(){
         return Boolean(this._connection.state)
     }
 
