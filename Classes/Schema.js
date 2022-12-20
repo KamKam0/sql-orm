@@ -64,8 +64,7 @@ class Schema extends Base{
         this.show()
         .then(datas => {
             datas = datas.map(e => Object.values(e)[0])
-            if(!datas.includes(this.name)) this.create().catch(err => {})
-            else{
+            if(datas.includes(this.name)){
                 this.describe()
                 .then(datas2 => {
                     datas2 = datas2.map(e => {return {name: e.Field.toLowerCase(), value: e.Type.toLowerCase()}})
