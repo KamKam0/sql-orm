@@ -1,11 +1,12 @@
 const Base = require("./basic")
 class Schema extends Base{
     #checked;
-    constructor(elements, connection){
+    constructor(elements, auto_create, connection){
         super(connection)
         this.id = elements.id
         this.name = elements.name
         this.columns = elements.columns
+        this.auto_create = auto_create
         this.#checked = this.#deploy()
     }
 
@@ -64,7 +65,10 @@ class Schema extends Base{
         this.show()
         .then(datas => {
             datas = datas.map(e => Object.values(e)[0])
-            if(datas.includes(this.name)){
+            if(!datas.includes(this.name)){
+                if(this.auto_create) this.create()
+            }
+            else{
                 this.describe()
                 .then(datas2 => {
                     datas2 = datas2.map(e => {return {name: e.Field.toLowerCase(), value: e.Type.toLowerCase()}})
