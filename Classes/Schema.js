@@ -1,12 +1,12 @@
 const Base = require("./basic")
 class Schema extends Base{
     #checked;
-    constructor(elements, auto_create, connection){
+    constructor(elements, connection){
         super(connection)
         this.id = elements.id
         this.name = elements.name
         this.columns = elements.columns
-        this.auto_create = auto_create
+        this.autoCreate = elements.autoCreate || false
         this.#checked = this.#deploy()
     }
 
@@ -66,7 +66,7 @@ class Schema extends Base{
         .then(datas => {
             datas = datas.map(e => Object.values(e)[0])
             if(!datas.includes(this.name)){
-                if(this.auto_create) this.create()
+                if(this.autoCreate) this.create()
             }
             else{
                 this.describe()
@@ -93,6 +93,7 @@ class Schema extends Base{
         if(!Array.isArray(datas.columns)) return {error: "Type of columns is not an Array", code: 8}
         let def_cols = datas.columns.filter(column =>  column.name && column.value && typeof column.name === "string" && typeof column.value === "string" && column.value.toLowerCase().startsWith("varchar") || ["int", "date"].includes(column.value.toLowerCase()))
         if(def_cols.length === 0)  return {error: "No valid column registered", code: 9}
+        if(datas.autoCreate && typeof datas.autoCreate !== "boolean") return {error: "Type of autoCreate is not boolean", code: 10}
         return {schema: {id: datas.id, name: datas.name, columns: def_cols}, code: 0}
     }
 }

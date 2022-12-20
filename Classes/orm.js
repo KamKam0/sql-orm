@@ -7,12 +7,12 @@ class ORM extends Base{
         this.schemas = new Map()
     }
     
-    createScheme(elements, autoc){
+    createScheme(elements){
         if(!this.connectionState) return "No SQL connection"
         if(this.schemas.get(elements.id)) return "Already Exists"
         let datas = Schemas.checkDatas(elements)
         if(datas.code !== 0) return datas.error
-        let nouvSche = new Schemas(datas.schema, autoc, this._connection)
+        let nouvSche = new Schemas(datas.schema, this._connection)
         this.schemas.set(elements.id, nouvSche)
         return nouvSche
     }
