@@ -7,7 +7,7 @@ class ORM extends Base{
         this.schemas = new Map()
     }
     
-    createScheme(elements){
+    createSchema(elements){
         if(!this.connectionState) return "No SQL connection"
         if(this.schemas.get(elements.id)) return "Already Exists"
         let datas = Schemas.checkDatas(elements)
@@ -17,64 +17,16 @@ class ORM extends Base{
         return nouvSche
     }
 
-    deleteScheme(id){
+    deleteSchema(id){
         if(!this.connectionState) return "No SQL connection"
         if(!this.schemas.get(id)) return "Doesn't Exist"
         this.schemas.delete(id)
     }
 
-    getScheme(id){
+    getSchema(id){
         if(!this.connectionState) return "No SQL connection"
         if(!this.schemas.get(id)) return "Doesn't Exist"
         return this.schemas.get(id)
-    }
-
-    select(table, options){
-        return this._treat(table, "select", options)
-    }
-
-    update(table, options1, options2){
-        return this._treat(table, "update", options1, options2)
-    }
-
-    insert(table, options){
-        return this._treat(table, "insert", options)
-    }
-
-    delete(table, options){
-        return this._treat(table, "delete", options)
-    }
-
-    create(table, options){
-        return this._treat(table, "create", options)
-    }
-
-    truncate(table){
-        return this._treat(table, "truncate")
-    }
-
-    drop(table){
-        return this._treat(table, "drop")
-    }
-
-    describe(table){
-        return this._treat(table, "describe")
-    }
-
-    alterAdd(table, options){
-        return this._treat(table, "alter_add", options)
-    }
-
-    alterModify(table, options){
-        return this._treat(table, "alter_modify", options)
-    }
-
-    alterDrop(table, options){
-        return this._treat(table, "alter_drop", options)
-    }
-
-    show(){
-        return this._treat(null, "show")
     }
 }
 

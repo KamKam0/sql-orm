@@ -10,56 +10,6 @@ class Schema extends Base{
         this.#checked = this.#deploy()
     }
 
-    select(options){
-        return this._treat(this.name, "select", options)
-    }
-
-    update(options1, options2){
-        return this._treat(this.name, "update", options1, options2)
-    }
-
-    insert(options){
-        return this._treat(this.name, "insert", options)
-    }
-
-    delete(options){
-        return this._treat(this.name, "delete", options)
-    }
-
-    create(name){
-        let colus = {}
-        this.columns.forEach(col => colus[col.name] = col.value)
-        return this._treat((name || this.name), "create", colus)
-    }
-
-    truncate(){
-        return this._treat(this.name, "truncate")
-    }
-
-    drop(){
-        return this._treat(this.name, "drop")
-    }
-
-    describe(){
-        return this._treat(this.name, "describe")
-    }
-
-    alterAdd(options){
-        return this._treat(this.name, "alter_add", options)
-    }
-
-    alterModify(options){
-        return this._treat(this.name, "alter_modify", options)
-    }
-
-    alterDrop(options){
-        return this._treat(this.name, "alter_drop", options)
-    }
-
-    show(){
-        return this._treat(this.name, "show")
-    }
-
     #deploy(){
         if(!this.connectionState) return "No SQL connection"
         this.show()
@@ -71,9 +21,12 @@ class Schema extends Base{
             else{
                 this.describe()
                 .then(datas2 => {
-                    datas2 = datas2.map(e => {return {name: e.Field.toLowerCase(), value: e.Type.toLowerCase()}})
-                    this.columns.filter(col => !datas2.find(e => col.name.toLowerCase() === e.name && col.value.toLowerCase() === e.value.toLowerCase())).forEach(col => {let e = {}; e[col.name] = col.value; this.alterAdd(e) })
-                    datas2.filter(col => !this.columns.find(e => col.name.toLowerCase() === e.name && col.value.toLowerCase() === e.value.toLowerCase())).forEach(col => this.alterDrop(col))
+                    datas2 = datas2.map(e => {return {name: e.Field, value: e.Type}})
+                    let comparecolumns = this.columns.map(e => {return {name: Object.keys(e)[0], value: Object.values(e)[0]}})
+                    let tommodifyname = comparecolumns.filter(col => datas2.find(e => col.name.toLowerCase() === e.name.toLowerCase() && col.name !== e.name)).forEach(col => this.alterModify({statment: "name", modif: [datas2.find(e => col.name.toLowerCase() === e.name.toLowerCase() && col.name !== e.name).name, col.name, col.value]}))
+                    let tomodifyvalue = comparecolumns.filter(col => datas2.find(e => col.name === e.name && col.value !== e.value)).forEach(col => this.alterModify({statment: "value", modif: [col.name, col.value]}))
+                    let toadd = comparecolumns.filter(col => !datas2.find(e => col.name.toLowerCase() === e.name.toLowerCase())).forEach(col => this.alterAdd(this.columns.find(e => Object.keys(e)[0] === col.name)))
+                    let todelete = datas2.filter(col => !comparecolumns.find(e => col.name.toLowerCase() === e.name.toLowerCase())).forEach(col => this.alterDrop(col))
                 })
                 .catch(err => {})
             }
@@ -91,7 +44,8 @@ class Schema extends Base{
         if(typeof datas.name !== "string") return {error: "Type of name is not a string", code: 6}
         if(!datas.columns) return {error: "No columns in datas", code: 7}
         if(!Array.isArray(datas.columns)) return {error: "Type of columns is not an Array", code: 8}
-        let def_cols = datas.columns.filter(column =>  column.name && column.value && typeof column.name === "string" && typeof column.value === "string" && column.value.toLowerCase().startsWith("varchar") || ["int", "date"].includes(column.value.toLowerCase()))
+        if(!datas.columns[0]) return {error: "Columns array must contain at least one object", code: 11}
+        let def_cols = datas.columns.filter(column => typeof column === "object" && Object.keys(column)[0] && Object.values(column)[0] && typeof Object.keys(column)[0] === "string" && typeof Object.values(column)[0] === "string" && Object.values(column)[0].toLowerCase().startsWith("varchar") || ["int", "date"].includes(Object.values(column)[0].toLowerCase()))
         if(def_cols.length === 0)  return {error: "No valid column registered", code: 9}
         if(datas.autoCreate && typeof datas.autoCreate !== "boolean") return {error: "Type of autoCreate is not boolean", code: 10}
         return {schema: {id: datas.id, name: datas.name, columns: def_cols}, code: 0}

@@ -7,7 +7,55 @@ class Basic{
         return Boolean(this._connection.state)
     }
 
-    _treat(table, argu, options1, options2){
+    select(table, options){
+        return this.#treat((this.name || table), "select", (this.name ? table : options))
+    }
+
+    update(table, options1, options2){
+        return this.#treat((this.name || table), "update", (this.name ? table : options1), (this.name ? options1 : options2))
+    }
+
+    insert(table, options){
+        return this.#treat((this.name || table), "insert", (this.name ? table : options))
+    }
+
+    delete(table, options){
+        return this.#treat((this.name || table), "delete", (this.name ? table : options))
+    }
+
+    create(table, options){
+        return this.#treat((this.name || table), "create", (this.name ? table : options))
+    }
+
+    truncate(table){
+        return this.#treat((this.name || table), "truncate")
+    }
+
+    drop(table){
+        return this.#treat((this.name || table), "drop")
+    }
+
+    describe(table){
+        return this.#treat((this.name || table), "describe")
+    }
+
+    alterAdd(table, options){
+        return this.#treat((this.name || table), "alter_add", (this.name ? table : options))
+    }
+
+    alterModify(table, options){
+        return this.#treat((this.name || table), "alter_modify", (this.name ? table : options))
+    }
+
+    alterDrop(table, options){
+        return this.#treat((this.name || table), "alter_drop", (this.name ? table : options))
+    }
+
+    show(){
+        return this.#treat(null, "show")
+    }
+
+    #treat(table, argu, options1, options2){
         return new Promise((resolve, reject) => {
             if(!this.connectionState) return reject("No SQL connection")
             let query = Basic.getQuery(table, argu, options1, options2)
@@ -42,7 +90,6 @@ class Basic{
                     text2.push(`'${ob[1]}'`)
                 })
                 object1 = {keys: `(${text1.join(", ")})`, values: `(${text2.join(", ")})`}
-                console.log(object1)
             }else if(argu ===  "create" || argu ===  "alter_add"){
                 let text = []
                 Object.entries(object1).filter(e => typeof e[1] === "string").filter(da => da[1].toLowerCase().startsWith("varchar") || ["int", "date"].includes(da[1].toLowerCase())).forEach(ob => {
@@ -51,6 +98,14 @@ class Basic{
                 text = text.join(", ")
                 object1 = text
             }else if(argu === "alter_drop") object1 = Object.values(object1)[0]
+            else if(argu === "alter_modify"){
+                //if(object1.statment === "name") object1.modif = `${object1.modif[0]} TO ${object1.modif[1]}`
+                if(object1.statment === "name") object1.modif = `${object1.modif[0]} ${object1.modif[1]} ${object1.modif[2]}`
+                if(object1.statment === "value") object1.modif = `${object1.modif[0]} ${object1.modif[1]};`
+                //if(object1.statment === "name") object1.statment = " RENAME COLUMN "
+                if(object1.statment === "value") object1.statment = " MODIFY COLUMN "
+                if(object1.statment === "name") object1.statment = " CHANGE "
+            }
             else{
                 let text = []
                 Object.entries(object1).filter(e => typeof e[1] === "string").forEach(ob => {
@@ -83,7 +138,6 @@ class Basic{
             break;
             case("delete"):
                 if(!object1) return {error: `Where object is needed for ${argu} argument`, code: 9}
-                console.log(object1)
                 final = `${argu.toUpperCase()} FROM ${table}${object1 ? " WHERE "+object1.replaceAll("null", null) : ""}`
             break;
             case("truncate"):
@@ -112,7 +166,7 @@ class Basic{
             break;
             case("alter_modify"):
                 if(!object1) return {error: `Values object is needed for ${argu} argument`, code: 9}
-                final = `${argu.toUpperCase().split("_")[0]} TABLE ${table} ${argu.toUpperCase().split("_")[1]} ${object1}`
+                final = `${argu.toUpperCase().split("_")[0]} TABLE ${table}${object1.statment}${object1.modif}`
             break;
             default:
                 return {error: "action is not valid", code: 6}
