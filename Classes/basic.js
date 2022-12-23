@@ -24,6 +24,11 @@ class Basic{
     }
 
     create(table, options){
+        if(this.id){
+            let cols = {}
+            this.columns.forEach(col => cols[Object.keys(col)[0]] = Object.values(col)[0])
+            return this.#treat((table|| this.name), "create", cols)
+        }
         return this.#treat((this.name || table), "create", (this.name ? table : options))
     }
 
