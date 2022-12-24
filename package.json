@@ -1,6 +1,6 @@
 {
   "name": "@kamkam1_0/sql-orm",
-  "version": "1.0.10",
+  "version": "1.0.11",
   "description": "",
   "main": "index.js",
   "scripts": {
@@ -13,7 +13,7 @@
   "bugs": {
     "url": "https://github.com/KamKam0/sql-orm/issues"
   },
-  "keywords": ["Discordjs", "Events", "Handler"],
+  "keywords": ["SQL", "ORM", "Schema", "Auto"],
   "homepage": "https://github.com/KamKam0/sql-orm",
   "author": "KamKam <kamkam.dev.contact@gmail.com>",
   "license": "BSD 2",
