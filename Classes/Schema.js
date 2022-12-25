@@ -4,9 +4,10 @@ class Schema extends Base{
     constructor(elements, connection){
         super(connection)
         this.id = elements.id
-        this.name = elements.name
+        this.name = elements.name || elements.id
         this.columns = elements.columns
         this.autoCreate = elements.autoCreate || false
+        this.autoInsert = elements.autoInsert || []
         this.#checked = this.#deploy()
     }
 
@@ -15,9 +16,7 @@ class Schema extends Base{
         this.show()
         .then(datas => {
             datas = datas.map(e => Object.values(e)[0])
-            if(!datas.includes(this.name)){
-                if(this.autoCreate) this.create()
-            }
+            if(!datas.includes(this.name)) this.autoCreate ? (this.create().then(() => this.autoInsert[0] ? this.autoInsert.forEach(insert => this.select(insert).then(e => e[0] ?? this.insert(insert)) ) : "")) : ""
             else{
                 this.describe()
                 .then(datas2 => {
@@ -27,6 +26,7 @@ class Schema extends Base{
                     let tomodifyvalue = comparecolumns.filter(col => datas2.find(e => col.name === e.name && col.value !== e.value)).forEach(col => this.alterModify({statment: "value", modif: [col.name, col.value]}))
                     let toadd = comparecolumns.filter(col => !datas2.find(e => col.name.toLowerCase() === e.name.toLowerCase())).forEach(col => this.alterAdd(this.columns.find(e => Object.keys(e)[0] === col.name)))
                     let todelete = datas2.filter(col => !comparecolumns.find(e => col.name.toLowerCase() === e.name.toLowerCase())).forEach(col => this.alterDrop(col))
+                    if(this.autoInsert[0]) this.autoInsert.forEach(insert => this.select(insert).then(e => e[0] ?? this.insert(insert)) )
                 })
                 .catch(err => {})
             }
@@ -40,15 +40,19 @@ class Schema extends Base{
         if(typeof datas !== "object") return {error: "Type of datas is not an object", code: 2}
         if(!datas.id) return {error: "No id in datas", code: 3}
         if(typeof datas.id !== "string") return {error: "Type of id is not a string", code: 4}
-        if(!datas.name) return {error: "No name in datas", code: 5}
-        if(typeof datas.name !== "string") return {error: "Type of name is not a string", code: 6}
+        if(datas.name && typeof datas.name !== "string") return {error: "Type of name is not a string", code: 6}
         if(!datas.columns) return {error: "No columns in datas", code: 7}
         if(!Array.isArray(datas.columns)) return {error: "Type of columns is not an Array", code: 8}
         if(!datas.columns[0]) return {error: "Columns array must contain at least one object", code: 11}
         let def_cols = datas.columns.filter(column => typeof column === "object" && Object.keys(column)[0] && Object.values(column)[0] && typeof Object.keys(column)[0] === "string" && typeof Object.values(column)[0] === "string" && Object.values(column)[0].toLowerCase().startsWith("varchar") || ["int", "date"].includes(Object.values(column)[0].toLowerCase()))
         if(def_cols.length === 0)  return {error: "No valid column registered", code: 9}
+        if(!datas.columns[0]) return {error: "Columns array must contain at least one object", code: 11}
+        if(datas.autoInsert && !Array.isArray(datas.autoInsert)) return {error: "Type of autoInsert is not an Array", code: 8}
+        if(datas.autoInsert && !datas.autoInsert[0]) return {error: "Columns array must contain at least one object", code: 11}
+        let def_insert = datas.autoInsert ? datas.autoInsert.filter(insert => typeof insert === "object" && Object.values(insert).filter(ins => typeof ins === "string").length === Object.values(insert).length) : []
+        if(datas.autoInsert && def_insert.length === 0)  return {error: "No valid insert registered", code: 9}
         if(datas.autoCreate && typeof datas.autoCreate !== "boolean") return {error: "Type of autoCreate is not boolean", code: 10}
-        return {schema: {id: datas.id, name: datas.name, columns: def_cols}, code: 0}
+        return {schema: {id: datas.id, name: datas.name, autoCreate: datas.autoCreate, columns: def_cols, autoInsert: def_insert}, code: 0}
     }
 }
 
