@@ -86,18 +86,18 @@ class Basic{
         if(!argu) return {error: "No action", code: 4}
         if(typeof argu !== "string") return {error: "action is not a string", code: 5}
         argu = argu.toLowerCase() 
-        if(object1 && typeof object1 === "object" && Object.entries(object1).length > 0 && Object.entries(object1).filter(e => typeof e[1] === "string").length > 0){
+        if(object1 && typeof object1 === "object" && Object.entries(object1).length > 0 && Object.entries(object1).filter(e => ["string", "boolean", "number"].includes(typeof e[1])).length > 0){
             if(argu === "insert"){
                 let text1 = []
                 let text2 = []
-                Object.entries(object1).filter(e => typeof e[1] === "string").forEach(ob => {
+                Object.entries(object1).filter(e => ["string", "boolean", "number"].includes(typeof e[1])).forEach(ob => {
                     text1.push(ob[0])
                     text2.push(`'${ob[1]}'`)
                 })
                 object1 = {keys: `(${text1.join(", ")})`, values: `(${text2.join(", ")})`}
             }else if(argu ===  "create" || argu ===  "alter_add"){
                 let text = []
-                Object.entries(object1).filter(e => typeof e[1] === "string").filter(da => da[1].toLowerCase().startsWith("varchar") || ["int", "date"].includes(da[1].toLowerCase())).forEach(ob => {
+                Object.entries(object1).filter(e => ["string", "boolean", "number"].includes(typeof e[1])).filter(da => da[1].toLowerCase().startsWith("varchar") || ["int", "date"].includes(da[1].toLowerCase())).forEach(ob => {
                     text.push(`${ob[0]} ${(!ob[1] || ob[1] == "") ? "VARCHAR(255)" : ob[1]}`)
                 })
                 text = text.join(", ")
@@ -113,16 +113,16 @@ class Basic{
             }
             else{
                 let text = []
-                Object.entries(object1).filter(e => typeof e[1] === "string").forEach(ob => {
+                Object.entries(object1).filter(e => ["string", "boolean", "number"].includes(typeof e[1])).forEach(ob => {
                     text.push(`${ob[0]} = '${ob[1]}'`)
                 })
                 text = text.join(" and ")
                 object1 = text
             }
         }else object1 = undefined
-        if(object2 && typeof object2 === "object" && Object.entries(object2).length > 0 && Object.entries(object2).filter(e => typeof e[1] === "string").length > 0){
+        if(object2 && typeof object2 === "object" && Object.entries(object2).length > 0 && Object.entries(object2).filter(e => ["string", "boolean", "number"].includes(typeof e[1])).length > 0){
             let text = []
-            Object.entries(object2).filter(e => typeof e[1] === "string").forEach(ob => {
+            Object.entries(object2).filter(e => ["string", "boolean", "number"].includes(typeof e[1])).forEach(ob => {
                 text.push(`${ob[0]} = '${ob[1]}'`)
             })
             text = text.join(" and ")
