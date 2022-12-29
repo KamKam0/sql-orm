@@ -17,7 +17,7 @@ npm install @kamkam1_0/sql-orm
 
 ```js
 const SQLORM = require("@kamkam1_0/sql-orm")
-let ORM = new ORM({
+let ORM = new SQLORM({
     host: "127.0.0.1",
     user: "root",
     port: 3306,

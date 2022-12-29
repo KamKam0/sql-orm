@@ -110,6 +110,13 @@ class Basic{
                 //if(object1.statment === "name") object1.statment = " RENAME COLUMN "
                 if(object1.statment === "value") object1.statment = " MODIFY COLUMN "
                 if(object1.statment === "name") object1.statment = " CHANGE "
+            }else if(argu ===  "update"){
+                let text = []
+                Object.entries(object1).filter(e => ["string", "boolean", "number"].includes(typeof e[1])).forEach(ob => {
+                    text.push(`${ob[0]} = '${ob[1]}'`)
+                })
+                text = text.join(", ")
+                object1 = text
             }
             else{
                 let text = []

@@ -11,7 +11,8 @@ class Connection extends Events{
         let co =  mysql.createConnection(elements)
         this.#checkError(co)
         co.on("error", error => {
-            if(error.code === "PROTOCOL_CONNECTION_LOST"){
+            if(error.code === "PROTOCOL_CONNECTION_LOST" || error.message === "PROTOCOL_CONNECTION_LOST"){
+                this.state = "false"
                 this.destroy()
                 this.connection = this.create(elements)
             }
