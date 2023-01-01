@@ -87,8 +87,8 @@ class Basic{
         if(typeof argu !== "string") return {error: "action is not a string", code: 5}
 
         argu = argu.toLowerCase()
-        object1 = check(object1)
-        object2 = check(object2)
+        object1 = check(object1, argu)
+        object2 = check(object2, argu)
 
         if(object1){
             let text = []
@@ -111,6 +111,10 @@ class Basic{
                     if(object1.statment === "value") object1.modif = `${object1.modif[0]} ${object1.modif[1]};`
                     if(object1.statment === "value") object1.statment = " MODIFY COLUMN "
                     if(object1.statment === "name") object1.statment = " CHANGE "
+                    text = object1
+                break;
+                case("alter_drop"):
+                    text = Object.values(object1)[0]
                 break;
                 default:
                     object1.forEach(ob => text.push(`${ob[0]} = '${ob[1]}'`) )
@@ -181,7 +185,15 @@ class Basic{
     }
 }
 
-function check(object){
+function check(object, argu){
+    if(argu === "alter_modify"){
+        if(object && typeof object === "object") return object
+        return null
+    }
+    if(argu === "alter_drop"){
+        if(object) return object
+        return null
+    }
     const verif = require("../injections")
     if(object && typeof object === "object"){
         object = Object.entries(object)
