@@ -6,7 +6,7 @@ class Basic{
     get connectionState(){
         return Boolean(this._connection.state)
     }
-
+    
     select(table, options){
         return this.#treat((this.name || table), "select", (this.name ? table : options))
     }
@@ -85,56 +85,49 @@ class Basic{
         if(typeof table !== "string" && argu !== "show") return {error: "Table is not a string", code: 3}
         if(!argu) return {error: "No action", code: 4}
         if(typeof argu !== "string") return {error: "action is not a string", code: 5}
-        argu = argu.toLowerCase() 
-        if(object1 && typeof object1 === "object" && Object.entries(object1).length > 0 && Object.entries(object1).filter(e => ["string", "boolean", "number"].includes(typeof e[1])).length > 0){
-            if(argu === "insert"){
-                let text1 = []
-                let text2 = []
-                Object.entries(object1).filter(e => ["string", "boolean", "number"].includes(typeof e[1])).forEach(ob => {
-                    text1.push(ob[0])
-                    text2.push(`'${ob[1]}'`)
-                })
-                object1 = {keys: `(${text1.join(", ")})`, values: `(${text2.join(", ")})`}
-            }else if(argu ===  "create" || argu ===  "alter_add"){
-                let text = []
-                Object.entries(object1).filter(e => ["string", "boolean", "number"].includes(typeof e[1])).filter(da => da[1].toLowerCase().startsWith("varchar") || ["int", "date"].includes(da[1].toLowerCase())).forEach(ob => {
-                    text.push(`${ob[0]} ${(!ob[1] || ob[1] == "") ? "VARCHAR(255)" : ob[1]}`)
-                })
-                text = text.join(", ")
-                object1 = text
-            }else if(argu === "alter_drop") object1 = Object.values(object1)[0]
-            else if(argu === "alter_modify"){
-                //if(object1.statment === "name") object1.modif = `${object1.modif[0]} TO ${object1.modif[1]}`
-                if(object1.statment === "name") object1.modif = `${object1.modif[0]} ${object1.modif[1]} ${object1.modif[2]}`
-                if(object1.statment === "value") object1.modif = `${object1.modif[0]} ${object1.modif[1]};`
-                //if(object1.statment === "name") object1.statment = " RENAME COLUMN "
-                if(object1.statment === "value") object1.statment = " MODIFY COLUMN "
-                if(object1.statment === "name") object1.statment = " CHANGE "
-            }else if(argu ===  "update"){
-                let text = []
-                Object.entries(object1).filter(e => ["string", "boolean", "number"].includes(typeof e[1])).forEach(ob => {
-                    text.push(`${ob[0]} = '${ob[1]}'`)
-                })
-                text = text.join(", ")
-                object1 = text
-            }
-            else{
-                let text = []
-                Object.entries(object1).filter(e => ["string", "boolean", "number"].includes(typeof e[1])).forEach(ob => {
-                    text.push(`${ob[0]} = '${ob[1]}'`)
-                })
-                text = text.join(" and ")
-                object1 = text
-            }
-        }else object1 = undefined
-        if(object2 && typeof object2 === "object" && Object.entries(object2).length > 0 && Object.entries(object2).filter(e => ["string", "boolean", "number"].includes(typeof e[1])).length > 0){
+
+        argu = argu.toLowerCase()
+        object1 = check(object1)
+        object2 = check(object2)
+
+        if(object1){
             let text = []
-            Object.entries(object2).filter(e => ["string", "boolean", "number"].includes(typeof e[1])).forEach(ob => {
-                text.push(`${ob[0]} = '${ob[1]}'`)
-            })
-            text = text.join(" and ")
-            object2 = text
-        }else object2 = undefined
+            let join;
+            switch(argu){
+                case("insert"):
+                    let text2 = []
+                    object1.forEach(ob => {
+                        text.push(ob[0])
+                        text2.push(`'${ob[1]}'`)
+                    })
+                    text = {keys: `(${text.join(", ")})`, values: `(${text2.join(", ")})`}
+                break;
+                case("create" || "alter_add"):
+                    object1.filter(da => da[1].toLowerCase().startsWith("varchar") || ["int", "date"].includes(da[1].toLowerCase())).forEach(ob =>  text.push(`${ob[0]} ${(!ob[1] || ob[1] == "") ? "VARCHAR(255)" : ob[1]}`) )
+                    join = ", "
+                break;
+                case("alter_modify"):
+                    if(object1.statment === "name") object1.modif = `${object1.modif[0]} ${object1.modif[1]} ${object1.modif[2]}`
+                    if(object1.statment === "value") object1.modif = `${object1.modif[0]} ${object1.modif[1]};`
+                    if(object1.statment === "value") object1.statment = " MODIFY COLUMN "
+                    if(object1.statment === "name") object1.statment = " CHANGE "
+                break;
+                default:
+                    object1.forEach(ob => text.push(`${ob[0]} = '${ob[1]}'`) )
+                    if(argu === "update") join = ",  "
+                    else join = " and "
+                break;
+            }
+            if(join) object1 = text.join(join)
+            else object1 = text
+        }
+
+        if(object2){
+            let text = []
+            object2.forEach(ob => text.push(`${ob[0]} = '${ob[1]}'`) )
+            object2 = text.join(" and ")
+        }
+
         let final;
         switch(argu){
             case("select"):
@@ -186,6 +179,15 @@ class Basic{
         }
         return {query: final, code: 0}
     }
+}
+
+function check(object){
+    const verif = require("../injections")
+    if(object && typeof object === "object"){
+        object = Object.entries(object)
+        if(object.length > 0 && object.filter(e => ["string", "boolean", "number"].includes(typeof e[1]) && verif(e[1])).length === object.length) return object
+    } 
+    return null
 }
 
 module.exports = Basic
