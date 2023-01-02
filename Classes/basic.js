@@ -4,7 +4,7 @@ class Basic{
     }
 
     get connectionState(){
-        return Boolean(this._connection.state)
+        return this._connection.state
     }
     
     select(table, options){

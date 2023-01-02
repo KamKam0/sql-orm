@@ -3,28 +3,38 @@ class Connection extends Events{
     constructor(elements){
         super()
         this.connection = this.create(elements)
-        this.state = "false"
+        this.state = false
     }
 
     create(elements){
         const mysql = require("mysql2")
         let co =  mysql.createConnection(elements)
         this.#checkError(co)
-        co.on("error", error => {
-            if(error.code === "PROTOCOL_CONNECTION_LOST" || error.message === "PROTOCOL_CONNECTION_LOST"){
-                this.state = "false"
-                this.destroy()
-                this.connection = this.create(elements)
-            }
-            else this.emit("ERROR", error)
-            console.log(error)
-        })
-        co.on("close", () => {
+        co.addListener("error", this.#retry)
+        co.once("close", () => {
             this.emit("CLOSE")
             console.log("SQL CLOSED")
         })
-        this.state = "true"
+        this.state = true
         return co
+    }
+
+    #retry(error){
+        console.log(error)
+        console.log(error.code)
+        console.log(error.name)
+        console.log(error.message)
+        console.log(error.content)
+        if(error.code === "PROTOCOL_CONNECTION_LOST" || error.message === "PROTOCOL_CONNECTION_LOST"){
+            console.log(26)
+            this.destroy()
+            console.log(26)
+            this.connection.removeListener("error", this.#retry)
+            console.log(26)
+            this.connection = this.create(elements)
+            console.log(26)
+        }
+        else this.emit("ERROR", error)
     }
 
     #checkError(connection){
@@ -46,12 +56,12 @@ class Connection extends Events{
     }
 
     end(){
-        this.state = "false"
+        this.state = false
         this.connection.end()
     }
 
     destroy(){
-        this.state = "false"
+        this.state = false
         this.connection.destroy()
     }
 }
