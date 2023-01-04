@@ -102,7 +102,7 @@ class Basic{
                     })
                     text = {keys: `(${text.join(", ")})`, values: `(${text2.join(", ")})`}
                 break;
-                case("alter_add"):
+                case("create"):
                     object1.filter(da => da[1].toLowerCase().startsWith("varchar") || ["int", "date"].includes(da[1].toLowerCase())).forEach(ob =>  text.push(`${ob[0]} ${(!ob[1] || ob[1] == "") ? "VARCHAR(255)" : ob[1]}`) )
                     join = ", "
                 break;
@@ -201,7 +201,7 @@ function check(object, argu){
     const verif = require("../injections")
     if(object && typeof object === "object"){
         object = Object.entries(object)
-        if(object.length > 0 && object.filter(e => ["string", "boolean", "number"].includes(typeof e[1]) && verif(e[1])).length === object.length) return object
+        if(object.length > 0 && (object.filter(e => ["string", "boolean", "number"].includes(typeof e[1])) || e[1] === null) && verif(e[1]).length === object.length) return object
     } 
     return null
 }
