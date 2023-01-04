@@ -2,8 +2,10 @@ const Events = require("node:events")
 class Connection extends Events{
     constructor(elements){
         super()
-        this.connection = this.create(elements)
         this.state = false
+        this.connection = null
+        this.elements = elements
+        this.deployed = this.create(elements)
     }
 
     create(elements){
@@ -15,24 +17,24 @@ class Connection extends Events{
             this.emit("CLOSE")
             console.log("SQL CLOSED")
         })
+        this.connection = co
         this.state = true
-        return co
+        return true
     }
 
     #retry(error){
-        console.log(error)
+        /*console.log(error)
         console.log(error.code)
         console.log(error.name)
         console.log(error.message)
-        console.log(error.content)
-        if(error.code === "PROTOCOL_CONNECTION_LOST" || error.message === "PROTOCOL_CONNECTION_LOST"){
-            console.log(26)
+        console.log(error.content)*/
+        let fatal = ["PROTOCOL_CONNECTION_LOST", "ECONNRESET", "read ECONNRESET"]
+        if(fatal.includes(error.code) || fatal.includes(error.message)){
+            //console.log(26)
             this.destroy()
-            console.log(26)
-            this.connection.removeListener("error", this.#retry)
-            console.log(26)
-            this.connection = this.create(elements)
-            console.log(26)
+            //console.log(26)
+            this.create(this.elements)
+            //console.log(26)
         }
         else this.emit("ERROR", error)
     }

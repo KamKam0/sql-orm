@@ -102,7 +102,11 @@ class Basic{
                     })
                     text = {keys: `(${text.join(", ")})`, values: `(${text2.join(", ")})`}
                 break;
-                case("create" || "alter_add"):
+                case("alter_add"):
+                    object1.filter(da => da[1].toLowerCase().startsWith("varchar") || ["int", "date"].includes(da[1].toLowerCase())).forEach(ob =>  text.push(`${ob[0]} ${(!ob[1] || ob[1] == "") ? "VARCHAR(255)" : ob[1]}`) )
+                    join = ", "
+                break;
+                case("alter_add"):
                     object1.filter(da => da[1].toLowerCase().startsWith("varchar") || ["int", "date"].includes(da[1].toLowerCase())).forEach(ob =>  text.push(`${ob[0]} ${(!ob[1] || ob[1] == "") ? "VARCHAR(255)" : ob[1]}`) )
                     join = ", "
                 break;
