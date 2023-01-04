@@ -201,7 +201,7 @@ function check(object, argu){
     const verif = require("../injections")
     if(object && typeof object === "object"){
         object = Object.entries(object)
-        if(object.length > 0 && object.filter(e => (["string", "boolean", "number"].includes(typeof e[1]) || e[1] === null)) && verif(e[1]).length === object.length) return object
+        if(object.length > 0 && object.filter(e => (["string", "boolean", "number"].includes(typeof e[1]) || e[1] === null) && verif(e[1]).length === object.length)) return object
     } 
     return null
 }
