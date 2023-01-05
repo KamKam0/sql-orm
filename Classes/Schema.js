@@ -35,6 +35,16 @@ class Schema extends Base{
         return true
     }
 
+    /**
+     * 
+     * @param {object} elements 
+     * @param {string} elements.id
+     * @param {string} [elements.name]
+     * @param {boolean} [elements.autoCreate]
+     * @param {object[]} [elements.autoInsert]
+     * @param {object[]} elements.columns
+     * @returns {object[]}
+     */
     static checkDatas(datas){
         if(!datas) return {error: "No datas", code: 1}
         if(typeof datas !== "object") return {error: "Type of datas is not an object", code: 2}

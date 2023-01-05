@@ -7,22 +7,53 @@ class Basic{
         return this._connection.state
     }
     
+    /**
+     * 
+     * @param {string} [table] the name of the table if it is not requested in a schema or if the schema does not have a name
+     * @param {object} options 
+     * @returns {object[]}
+     */
     select(table, options){
         return this.#treat((this.name || table), "select", (this.name ? table : options))
     }
-
+    
+    /**
+     * 
+     * @param {string} [table] 
+     * @param {object} options1 
+     * @param {object} options2 
+     * @returns {object[]}
+     */
     update(table, options1, options2){
         return this.#treat((this.name || table), "update", (this.name ? table : options1), (this.name ? options1 : options2))
     }
 
+    /**
+     * 
+     * @param {string} [table] 
+     * @param {object} options 
+     * @returns {object[]}
+     */
     insert(table, options){
         return this.#treat((this.name || table), "insert", (this.name ? table : options))
     }
 
+    /**
+     * 
+     * @param {string} [table] 
+     * @param {object} options 
+     * @returns {object[]}
+     */
     delete(table, options){
         return this.#treat((this.name || table), "delete", (this.name ? table : options))
     }
 
+    /**
+     * 
+     * @param {string} [table] 
+     * @param {object} options 
+     * @returns {object[]}
+     */
     create(table, options){
         if(this.id){
             let cols = {}
@@ -32,30 +63,67 @@ class Basic{
         return this.#treat((this.name || table), "create", (this.name ? table : options))
     }
 
+    /**
+     * 
+     * @param {string} [table] 
+     * @returns {object[]}
+     */
     truncate(table){
         return this.#treat((this.name || table), "truncate")
     }
 
+    /**
+     * 
+     * @param {string} [table] 
+     * @returns {object[]}
+     */
     drop(table){
         return this.#treat((this.name || table), "drop")
     }
 
+    /**
+     * 
+     * @param {string} [table] 
+     * @returns {object[]}
+     */
     describe(table){
         return this.#treat((this.name || table), "describe")
     }
 
+    /**
+     * 
+     * @param {string} [table] 
+     * @param {object} options 
+     * @returns {object[]}
+     */
     alterAdd(table, options){
         return this.#treat((this.name || table), "alter_add", (this.name ? table : options))
     }
 
+    /**
+     * 
+     * @param {string} [table] 
+     * @param {object} options 
+     * @returns {object[]}
+     */
     alterModify(table, options){
         return this.#treat((this.name || table), "alter_modify", (this.name ? table : options))
     }
 
+    /**
+     * 
+     * @param {string} [table] 
+     * @param {object} options 
+     * @returns {object[]}
+     */
     alterDrop(table, options){
         return this.#treat((this.name || table), "alter_drop", (this.name ? table : options))
     }
 
+    /**
+     * 
+     * @returns {object[]}
+     */
     show(){
         return this.#treat(null, "show")
     }
@@ -71,6 +139,11 @@ class Basic{
         })
     }
 
+    /**
+     * 
+     * @param {string} query 
+     * @returns {object[]}
+     */
     async query(query){
         return new Promise((resolve, reject) => {
             this._connection.connection.query(query, function(err, data){
@@ -80,6 +153,14 @@ class Basic{
         })
     }
 
+    /**
+     * 
+     * @param {string} [table] 
+     * @param {string} argu 
+     * @param {object} object1 
+     * @param {object} object2 
+     * @returns 
+     */
     static getQuery(table, argu, object1, object2){
         if(!table && argu !== "show") return {error: "No table", code: 2}
         if(typeof table !== "string" && argu !== "show") return {error: "Table is not a string", code: 3}

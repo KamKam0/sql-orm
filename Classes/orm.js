@@ -7,6 +7,16 @@ class ORM extends Base{
         this.schemas = new Map()
     }
     
+    /**
+     * 
+     * @param {object} elements 
+     * @param {string} elements.id
+     * @param {string} [elements.name]
+     * @param {boolean} [elements.autoCreate]
+     * @param {object[]} [elements.autoInsert]
+     * @param {object[]} elements.columns
+     * @returns {object[]|string}
+     */
     createSchema(elements){
         if(!this.connectionState) return "No SQL connection"
         let datas = Schemas.checkDatas(elements)
@@ -18,12 +28,22 @@ class ORM extends Base{
         return nouvSche
     }
 
+    /**
+     * 
+     * @param {string} id 
+     * @returns 
+     */
     deleteSchema(id){
         if(!this.connectionState) return "No SQL connection"
         if(!this.schemas.get(id)) return "Doesn't Exist"
         this.schemas.delete(id)
     }
 
+    /**
+     * 
+     * @param {string} id 
+     * @returns {object[]|string}
+     */
     getSchema(id){
         if(!this.connectionState) return "No SQL connection"
         if(!this.schemas.get(id)) return "Doesn't Exist"
