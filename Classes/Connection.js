@@ -1,10 +1,12 @@
 const Events = require("node:events")
 class Connection extends Events{
+    #HandleError;
     constructor(elements){
         super()
         this.state = false
         this.connection = null
         this.elements = elements
+        this.#HandleError = this.#retry.bind(this)
         this.deployed = this.create(elements)
     }
 
@@ -12,7 +14,7 @@ class Connection extends Events{
         const mysql = require("mysql2")
         let co =  mysql.createConnection(elements)
         this.#checkError(co)
-        co.addListener("error", this.#retry)
+        co.addListener("error", this.#HandleError)
         co.once("close", () => {
             this.emit("CLOSE")
             console.log("SQL CLOSED")
@@ -23,20 +25,12 @@ class Connection extends Events{
     }
 
     #retry(error){
-        /*console.log(error)
-        console.log(error.code)
-        console.log(error.name)
-        console.log(error.message)
-        console.log(error.content)*/
+        this.emit("ERROR", error)
         let fatal = ["PROTOCOL_CONNECTION_LOST", "ECONNRESET", "read ECONNRESET"]
         if(fatal.includes(error.code) || fatal.includes(error.message)){
-            //console.log(26)
             this.destroy()
-            //console.log(26)
             this.create(this.elements)
-            //console.log(26)
         }
-        else this.emit("ERROR", error)
     }
 
     #checkError(connection){
