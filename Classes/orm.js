@@ -9,9 +9,10 @@ class ORM extends Base{
     
     createSchema(elements){
         if(!this.connectionState) return "No SQL connection"
-        if(this.schemas.get(elements.id)) return "Already Exists"
         let datas = Schemas.checkDatas(elements)
         if(datas.code !== 0) return datas.error
+        if(this.schemas.get(elements.id)) return "Already Exists"
+        if([...this.schemas.values()].find(e => (e.name === elements.id || e.id === elements.id) || (e.name === elements.name || e.id === elements.name))) return "Already Exists with name"
         let nouvSche = new Schemas(datas.schema, this._connection)
         this.schemas.set(elements.id, nouvSche)
         return nouvSche
