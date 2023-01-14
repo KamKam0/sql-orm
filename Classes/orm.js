@@ -15,7 +15,7 @@ class ORM extends Base{
      * @param {boolean} [elements.autoCreate]
      * @param {object[]} [elements.autoInsert]
      * @param {object[]} elements.columns
-     * @returns {object[]|string}
+     * @returns {object|string}
      */
     createSchema(elements){
         if(!this.connectionState) return "No SQL connection"
@@ -42,7 +42,7 @@ class ORM extends Base{
     /**
      * 
      * @param {string} id 
-     * @returns {object[]|string}
+     * @returns {object|string}
      */
     getSchema(id){
         if(!this.connectionState) return "No SQL connection"

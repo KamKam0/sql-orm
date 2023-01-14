@@ -37,6 +37,14 @@ class Schema extends Base{
 
     /**
      * 
+     * @returns {object}
+     */
+    columnsToJSON(){
+        return this.columns.map(e => {return {name: Object.keys(e)[0], value: Object.values(e)[0]}})
+    }
+
+    /**
+     * 
      * @param {object} elements 
      * @param {string} elements.id
      * @param {string} [elements.name]

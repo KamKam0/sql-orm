@@ -1,8 +1,14 @@
 class Basic{
     constructor(connection){
+        /**
+         * @private
+         */
         this._connection = connection
     }
 
+    /**
+     * @returns {boolean}
+     */
     get connectionState(){
         return this._connection.state
     }
@@ -11,7 +17,7 @@ class Basic{
      * 
      * @param {string} [table] the name of the table if it is not requested in a schema or if the schema does not have a name
      * @param {object} options 
-     * @returns {object[]}
+     * @returns {object}
      */
     select(table, options){
         return this.#treat((this.name || table), "select", (this.name ? table : options))
@@ -22,7 +28,7 @@ class Basic{
      * @param {string} [table] 
      * @param {object} options1 
      * @param {object} options2 
-     * @returns {object[]}
+     * @returns {object}
      */
     update(table, options1, options2){
         return this.#treat((this.name || table), "update", (this.name ? table : options1), (this.name ? options1 : options2))
@@ -32,7 +38,7 @@ class Basic{
      * 
      * @param {string} [table] 
      * @param {object} options 
-     * @returns {object[]}
+     * @returns {object}
      */
     insert(table, options){
         return this.#treat((this.name || table), "insert", (this.name ? table : options))
@@ -42,7 +48,7 @@ class Basic{
      * 
      * @param {string} [table] 
      * @param {object} options 
-     * @returns {object[]}
+     * @returns {object}
      */
     delete(table, options){
         return this.#treat((this.name || table), "delete", (this.name ? table : options))
@@ -52,7 +58,7 @@ class Basic{
      * 
      * @param {string} [table] 
      * @param {object} options 
-     * @returns {object[]}
+     * @returns {object}
      */
     create(table, options){
         if(this.id){
@@ -66,7 +72,7 @@ class Basic{
     /**
      * 
      * @param {string} [table] 
-     * @returns {object[]}
+     * @returns {object}
      */
     truncate(table){
         return this.#treat((this.name || table), "truncate")
@@ -75,7 +81,7 @@ class Basic{
     /**
      * 
      * @param {string} [table] 
-     * @returns {object[]}
+     * @returns {object}
      */
     drop(table){
         return this.#treat((this.name || table), "drop")
@@ -84,7 +90,7 @@ class Basic{
     /**
      * 
      * @param {string} [table] 
-     * @returns {object[]}
+     * @returns {object}
      */
     describe(table){
         return this.#treat((this.name || table), "describe")
@@ -94,7 +100,7 @@ class Basic{
      * 
      * @param {string} [table] 
      * @param {object} options 
-     * @returns {object[]}
+     * @returns {object}
      */
     alterAdd(table, options){
         return this.#treat((this.name || table), "alter_add", (this.name ? table : options))
@@ -104,7 +110,7 @@ class Basic{
      * 
      * @param {string} [table] 
      * @param {object} options 
-     * @returns {object[]}
+     * @returns {object}
      */
     alterModify(table, options){
         return this.#treat((this.name || table), "alter_modify", (this.name ? table : options))
@@ -114,7 +120,7 @@ class Basic{
      * 
      * @param {string} [table] 
      * @param {object} options 
-     * @returns {object[]}
+     * @returns {object}
      */
     alterDrop(table, options){
         return this.#treat((this.name || table), "alter_drop", (this.name ? table : options))
@@ -122,7 +128,7 @@ class Basic{
 
     /**
      * 
-     * @returns {object[]}
+     * @returns {object}
      */
     show(){
         return this.#treat(null, "show")
@@ -142,7 +148,7 @@ class Basic{
     /**
      * 
      * @param {string} query 
-     * @returns {object[]}
+     * @returns {object}
      */
     async query(query){
         return new Promise((resolve, reject) => {
@@ -159,7 +165,7 @@ class Basic{
      * @param {string} argu 
      * @param {object} object1 
      * @param {object} object2 
-     * @returns 
+     * @returns {string}
      */
     static getQuery(table, argu, object1, object2){
         if(!table && argu !== "show") return {error: "No table", code: 2}
@@ -270,6 +276,12 @@ class Basic{
     }
 }
 
+/**
+ * 
+ * @param {object} object 
+ * @param {string} argu 
+ * @returns {object|null}
+ */
 function check(object, argu){
     if(argu === "alter_modify"){
         if(object && typeof object === "object") return object

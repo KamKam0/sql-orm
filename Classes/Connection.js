@@ -1,6 +1,14 @@
 const Events = require("node:events")
 class Connection extends Events{
     #HandleError;
+    /**
+     * 
+     * @param {object} elements the elements to open the connexion
+     * @param {string} elements.host
+     * @param {string} elements.port
+     * @param {string} elements.database
+     * @param {string} elements.user
+     */
     constructor(elements){
         super()
         this.state = false
@@ -10,6 +18,15 @@ class Connection extends Events{
         this.deployed = this.create(elements)
     }
 
+    /**
+     * 
+     * @param {object} elements the elements to open the connexion
+     * @param {string} elements.host
+     * @param {string} elements.port
+     * @param {string} elements.database
+     * @param {string} elements.user
+     * @returns {boolean}
+     */
     create(elements){
         const mysql = require("mysql2")
         let co =  mysql.createConnection(elements)
