@@ -15,7 +15,6 @@ class Schema extends Base{
         if(!this.connectionState) return "No SQL connection"
         this.show()
         .then(datas => {
-            datas = datas.map(e => Object.values(e)[0])
             if(!datas.includes(this.name)) this.autoCreate ? (this.create().then(() => this.autoInsert[0] ? this.autoInsert.forEach(insert => this.select(insert).then(e => e[0] ?? this.insert(insert)) ) : "")) : ""
             else{
                 this.describe()

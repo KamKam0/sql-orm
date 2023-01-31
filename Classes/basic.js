@@ -136,11 +136,14 @@ class Basic{
 
     #treat(table, argu, options1, options2){
         return new Promise((resolve, reject) => {
-            if(!this.connectionState) return reject("No SQL connection")
+            if(!this.connectionState) return reject(new Error("No SQL connection"))
             let query = Basic.getQuery(table, argu, options1, options2)
-            if(query.code !== 0) return reject(query.error)
+            if(query.code !== 0) return reject(new Error(query.error))
             this.query(query.query)
-            .then(datas => resolve(datas))
+            .then(datas => {
+                if(argu === "show") return resolve(datas.map(e => Object.values(e)[0]))
+                else return resolve(datas)
+            })
             .catch(datas =>  reject(datas))
         })
     }
